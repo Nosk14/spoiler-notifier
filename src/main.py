@@ -23,7 +23,7 @@ def get_cards():
 def load_cache(cache):
     with open(CACHE_PATH, 'r') as fin:
         for line in fin:
-            cache.add(line)
+            cache.add(line[:-1])
 
 
 def write_new_values_to_cache(values):
