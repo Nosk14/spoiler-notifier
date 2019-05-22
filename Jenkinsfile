@@ -20,7 +20,7 @@ node() {
                 def runArgs = '\
 -e "BOT_TOKEN=$token" \
 -e "TELEGRAM_CHAT=$telegram_channel" \
--v /home/carlos/mtg:/usr/local/etc
+-v /home/carlos/mtg:/usr/local/etc \
 --restart unless-stopped \
 --name ' + image_name
 
