@@ -1,4 +1,4 @@
-from urllib.request import Request, urlopen
+from urllib.request import Request, urlopen, quote
 from htmlparsers import MagicSpoilerParser
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from random import randint
@@ -39,9 +39,11 @@ def write_new_values_to_cache(values):
 def notify(bot, card):
     logging.info("New card url: " + card['link'])
     logging.info("New card img: " + card['img'])
-    button = InlineKeyboardButton("Open in browser", url=card['link'])
+    card_link = quote(card['link'])
+    button = InlineKeyboardButton("Open in browser", url=card_link)
     markup = InlineKeyboardMarkup([[button]])
-    bot.send_photo(os.environ['TELEGRAM_CHAT'], card['img'], reply_markup=markup)
+    card_img = quote(card['img'])
+    bot.send_photo(os.environ['TELEGRAM_CHAT'], card_img, reply_markup=markup)
 
 
 if __name__ == '__main__':
