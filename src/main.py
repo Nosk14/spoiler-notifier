@@ -2,12 +2,16 @@ from urllib.request import Request, urlopen
 from htmlparsers import MagicSpoilerParser
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from random import randint
+import logging
 import os
 import time
 
 
 SPOILERS_WEB = "http://www.magicspoiler.com/mtg-set/modern-horizons/"
 CACHE_PATH = "/usr/local/etc/mtg_spoiler_cache.txt"
+
+logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s',
+                    level=os.environ.get("LOG_LEVEL", logging.INFO))
 
 
 def get_cards():
@@ -30,9 +34,11 @@ def write_new_values_to_cache(values):
     with open(CACHE_PATH, 'a') as fout:
         for value in values:
             fout.write(value+"\n")
-
+    logging.info(str(len(values)) + " has been written to cache.")
 
 def notify(bot, card):
+    logging.info("New card url: " + card['link'])
+    logging.info("New card img: " + card['img'])
     button = InlineKeyboardButton("Open in browser", url=card['link'])
     markup = InlineKeyboardMarkup([[button]])
     bot.send_photo(os.environ['TELEGRAM_CHAT'], card['img'], reply_markup=markup)
