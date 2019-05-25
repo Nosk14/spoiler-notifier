@@ -39,10 +39,10 @@ def write_new_values_to_cache(values):
 def notify(bot, card):
     logging.info("New card url: " + card['link'])
     logging.info("New card img: " + card['img'])
-    card_link = quote(card['link'])
+    card_link = quote(card['link'], safe='/?:')
     button = InlineKeyboardButton("Open in browser", url=card_link)
     markup = InlineKeyboardMarkup([[button]])
-    card_img = quote(card['img'])
+    card_img = quote(card['img'], safe='/?:')
     bot.send_photo(os.environ['TELEGRAM_CHAT'], card_img, reply_markup=markup)
 
 
