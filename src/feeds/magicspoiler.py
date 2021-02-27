@@ -1,6 +1,7 @@
 from html.parser import HTMLParser
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
+from dataclasses import dataclass
 import logging
 
 
@@ -17,33 +18,23 @@ class Magicspoiler:
         pass
 
     def get_new_cards(self, already_known_cards):
-        new_cards = []
-        for link in Magicspoiler.LINKS:
-            page_number = 1
-            cont = True
-            while cont:
-                cards = self.__get_all_cards_from_page(link, page_number)
-                relevant_cards = [c for c in cards if c['link'] not in already_known_cards]
-                new_cards.extend(relevant_cards)
-                page_number += 1
-                if len(cards) == 0 or len(relevant_cards) < len(cards):
-                    cont = False
-        return new_cards
+        all_cards = self.get_all_cards()
+        return {c for c in all_cards if c.link not in already_known_cards}
 
     def get_all_cards(self):
-        cards = []
+        cards = set()
         for link in Magicspoiler.LINKS:
-            cards.extend(self.__get_all_cards_from_link(link))
+            cards.update(self.__get_all_cards_from_link(link))
         return cards
 
     def __get_all_cards_from_link(self, link):
-        total_cards = []
+        total_cards = set()
         page = 1
         cards = self.__get_all_cards_from_page(link, page)
-        total_cards.extend(cards)
-        while cards:
+        total_cards.update(cards)
+        while len(cards) > 0:
             cards = self.__get_all_cards_from_page(link, page)
-            total_cards.extend(cards)
+            total_cards.update(cards)
             page += 1
         return total_cards
 
@@ -51,7 +42,7 @@ class Magicspoiler:
         try:
             code, html = self.__get_html(link, page_number)
         except HTTPError:
-            return []
+            return set()
         parser = MagicSpoilerParser()
         parser.feed(html)
         return parser.cards
@@ -68,7 +59,7 @@ class MagicSpoilerParser(HTMLParser):
     def __init__(self):
         super().__init__()
         self.__is_parsing_card = False
-        self.cards = []
+        self.cards = set()
         self.__current_card = {}
 
     def error(self, message):
@@ -86,9 +77,23 @@ class MagicSpoilerParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag == 'div' and self.__is_parsing_card:
             self.__is_parsing_card = False
-            self.cards.append(self.__current_card)
+            self.cards.add(Card(**self.__current_card))
             self.__current_card = {}
 
     def handle_data(self, data):
         pass
 
+
+@dataclass(order=True, frozen=True)
+class Card:
+    name: str = ""
+    link: str = ""
+    img: str = ""
+
+
+if __name__ == '__main__':
+    m = Magicspoiler()
+    new_cards = m.get_new_cards([])
+    l = list(new_cards)
+    l.sort()
+    a = 1
