@@ -21,12 +21,15 @@ def notify(bot, card, disable_notifications):
 
 
 if __name__ == '__main__':
+    logging.info("Starting!")
     telegram_bot = Bot(os.environ['BOT_TOKEN'])
     feed = Magicspoiler()
     actual_cards = feed.get_all_cards()
     cache = {card['link'] for card in actual_cards}
+    logging.info("Cache filled with actual data. Waiting for next iteration")
     time.sleep(15 * 60)
     while True:
+        logging.info("Starting new iteration")
         new_cards = feed.get_new_cards(cache)
         current_hour = datetime.datetime.now().hour
         disable_notifications = current_hour < 8 or current_hour > 22
@@ -34,4 +37,5 @@ if __name__ == '__main__':
             logging.info("New card:" + card['link'] + " - " + card['img'])
             cache.add(card['link'])
             notify(telegram_bot, card, disable_notifications)
+        logging.info("Iteration finished")
         time.sleep(15 * 60)

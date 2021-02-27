@@ -17,7 +17,18 @@ class Magicspoiler:
         pass
 
     def get_new_cards(self, already_known_cards):
-        return []
+        new_cards = []
+        for link in Magicspoiler.LINKS:
+            page_number = 1
+            cont = True
+            while cont:
+                cards = self.__get_all_cards_from_page(link, page_number)
+                relevant_cards = [c for c in cards if c['link'] not in already_known_cards]
+                new_cards.extend(relevant_cards)
+                page_number += 1
+                if len(cards) == 0 or len(relevant_cards) < len(cards):
+                    cont = False
+        return new_cards
 
     def get_all_cards(self):
         cards = []
@@ -80,9 +91,4 @@ class MagicSpoilerParser(HTMLParser):
 
     def handle_data(self, data):
         pass
-
-
-if __name__ == '__main__':
-   cards = Magicspoiler().get_all_cards()
-   a = 1
 
