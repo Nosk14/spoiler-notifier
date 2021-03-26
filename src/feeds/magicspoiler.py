@@ -8,7 +8,6 @@ import logging
 class Magicspoiler:
 
     LINKS = [
-        'http://www.magicspoiler.com/mtg-set/time-spiral-remastered/',
         'http://www.magicspoiler.com/mtg-set/strixhaven/'
     ]
 
