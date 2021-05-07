@@ -8,8 +8,10 @@ import logging
 class Mythicspoiler:
 
     LINKS = [
-        'https://mythicspoiler.com/mh2/'
+        'http://mythicspoiler.com/newspoilers.html'
     ]
+
+    BASE_URL = 'http://mythicspoiler.com/'
 
     def __init__(self):
         pass
@@ -29,7 +31,7 @@ class Mythicspoiler:
             code, html = self.__get_html(link,)
         except HTTPError:
             return set()
-        parser = MythicspoilerParser(link)
+        parser = MythicspoilerParser()
         parser.feed(html)
         return parser.cards
 
@@ -41,22 +43,22 @@ class Mythicspoiler:
 
 class MythicspoilerParser(HTMLParser):
 
-    def __init__(self, url):
+    def __init__(self):
         super().__init__()
         self.__is_parsing_card = False
         self.cards = set()
         self.__current_card = {'name': ''}
-        self.base_url = url
 
     def error(self, message):
         logging.error(message)
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'a' and ('class', 'card') in attrs:
+        if tag == 'div' and ('class', 'grid-card') in attrs:
             self.__is_parsing_card = True
-            self.__current_card['link'] = self.base_url + list(filter(lambda att: att[0] == 'href', attrs))[0][1]
+        elif self.__is_parsing_card and tag == 'a':
+            self.__current_card['link'] = Mythicspoiler.BASE_URL + list(filter(lambda att: att[0] == 'href', attrs))[0][1].strip()
         elif self.__is_parsing_card and tag == 'img':
-            self.__current_card['img'] = self.base_url + list(filter(lambda att: att[0] == 'src', attrs))[0][1]
+            self.__current_card['img'] = Mythicspoiler.BASE_URL + list(filter(lambda att: att[0] == 'src', attrs))[0][1].strip()
 
     def handle_endtag(self, tag):
         if tag == 'a' and self.__is_parsing_card:
