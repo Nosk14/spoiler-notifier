@@ -1,4 +1,4 @@
-from feeds.magicspoiler import Magicspoiler
+from feeds.mythicspoiler import Mythicspoiler
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from urllib.parse import quote
 import logging
@@ -23,7 +23,7 @@ def notify(bot, card, disable_notifications):
 if __name__ == '__main__':
     logging.info("Starting!")
     telegram_bot = Bot(os.environ['BOT_TOKEN'])
-    feed = Magicspoiler()
+    feed = Mythicspoiler()
     actual_cards = feed.get_all_cards()
     cache = {card.link for card in actual_cards}
     logging.info("Cache filled with actual data. Waiting for next iteration")

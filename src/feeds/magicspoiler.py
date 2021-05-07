@@ -1,7 +1,7 @@
 from html.parser import HTMLParser
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
-from dataclasses import dataclass
+from feeds import Card
 import logging
 
 
@@ -81,13 +81,6 @@ class MagicSpoilerParser(HTMLParser):
 
     def handle_data(self, data):
         pass
-
-
-@dataclass(order=True, frozen=True)
-class Card:
-    name: str = ""
-    link: str = ""
-    img: str = ""
 
 
 if __name__ == '__main__':
